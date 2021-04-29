@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/disguiseddev/dailyTasks#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "node-telegram-bot-api": "^0.52.0"
   }
 }
