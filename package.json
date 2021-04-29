@@ -1,0 +1,22 @@
+{
+  "name": "dailytasks",
+  "version": "1.0.0",
+  "description": "Telegram bot that stores daily tasks ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/disguiseddev/dailyTasks.git"
+  },
+  "author": "disguiseddev",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/disguiseddev/dailyTasks/issues"
+  },
+  "homepage": "https://github.com/disguiseddev/dailyTasks#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
