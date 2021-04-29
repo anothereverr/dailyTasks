@@ -1,4 +1,5 @@
 require('./config/config')
+const mongoConnect = require('./model/index')
 const app = require('express')()
 const botManager = require('./telegram/botManager')
 
@@ -18,3 +19,6 @@ app.listen(PORT, () => {
 
 // Initialize bot manager
 botManager()
+
+// Connect to mongoDB
+mongoConnect()
