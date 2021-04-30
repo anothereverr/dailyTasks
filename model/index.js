@@ -8,8 +8,8 @@ const mongoConnect = () => {
         useFindAndModify: true,
         useCreateIndex: true
     })
-    .then( res => console.log('[MongoDB] Connected Succesfully'))
-    .catch( err => console.log(`[MongoDB] Error on connection ${err}`))
+    .then( res => console.info('[MongoDB] Connected Succesfully'))
+    .catch( err => console.error(`[MongoDB] Error on connection ${err}`))
 
 }
 
