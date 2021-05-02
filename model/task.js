@@ -17,7 +17,7 @@ let taskSchema = new Schema({
         type: String,
         required: [true, 'task type is required']
     },
-    taskclassification: {
+    taskClassification: {
         type: String
     },
     createdStamp: {
