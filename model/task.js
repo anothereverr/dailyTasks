@@ -1,5 +1,4 @@
-const mongoose = require('mongoose');
-const uniqueValidator = require('mongoose-unique-validator')
+const mongoose = require('mongoose')
 
 let Schema = mongoose.Schema
 
@@ -28,7 +27,5 @@ let taskSchema = new Schema({
         default: true
     },
 })
-
-taskSchema.plugin(uniqueValidator, {message: '{PATH} must be unique'})
 
 module.exports = mongoose.model('tasks', taskSchema)
