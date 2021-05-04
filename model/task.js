@@ -6,7 +6,6 @@ let Schema = mongoose.Schema
 let taskSchema = new Schema({
     chatId: {
         type: Number,
-        unique: true,
         required: [true, 'Chat id is required']
     },
     taskName: {

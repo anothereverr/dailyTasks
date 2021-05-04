@@ -13,17 +13,30 @@ const botManager = () => {
 
         checkNewUser(msg, chatId).then(res => {
 
-            if (res) return;
+            if (res) return
 
-            let cleanTask = getCleanMessage(msg.text)
-            if (!cleanTask) return bot.sendMessage(chatId, 'Opps! wrong task format, please stick to this [-n TaskName -c TaskClassification -t TaskType]')
+            // Check if message is valid
+            const validMessage = checkMessageType(msg.text)
 
-            // TODO: RETURN NUMBER OF TASK SAVED ON THE DAY
-            saveTask(cleanTask, chatId)
-                .then(res => bot.sendMessage(chatId, `Your task is now on the system, keep the production going!`))
-                .catch(err => bot.sendMessage(chatId, `Opps! we have an error with your task --> ${err}`))
+            switch (validMessage){
+                case "task": 
+                    saveTask(getCleanMessage(msg.text), chatId)
+                        .then(res => bot.sendMessage(chatId, `Your task is now on the system, keep the production going! \nYou have ${res} tasks registered for today!`))
+                        .catch(err => bot.sendMessage(chatId, `Opps! we have an error with your task --> ${err}`))
+                    break
 
+                case "taskList":
+                    bot.sendMessage(chatId, 'Opps! function not implemented yet, sorry')
+                    break
 
+                case "taskStats":
+                    bot.sendMessage(chatId, 'Opps! function not implemented yet, sorry')
+                    break
+
+                default:
+                    bot.sendMessage(chatId, 'Opps! i dont know what are you asking for, try to type [help]')  
+                    break  
+            }
         }).catch(err => console.log(err))
 
         
@@ -47,13 +60,11 @@ async function checkNewUser(msg, chatId) {
     return false
 }
 
-/* Message structure
+/* Task structure
 * -n TaskName -c TaskClassification -t TaskType
 */ 
 const getCleanMessage = (message) => {
-    // Check delimiters
-    if(!message.includes('-n') && !message.includes('-c')) return false
-
+    
     const [blank, taskName, taskClassification, taskType] = message.split('-')
 
     return {
@@ -61,6 +72,25 @@ const getCleanMessage = (message) => {
         taskClassification : taskClassification.substring(2),
         taskType : taskType.substring(2),
     }
+}
+
+/*
+* Task Structure -> -n TaskName -c TaskClassification -t TaskType
+* TaskList -> taskList TODO: ADD PARAMETERS LIKE AMOUNT OF TASK DISPLAY OR PRETTY DISPLAY IF POSSIBLE
+* TaskStats -> taskStats TODO: ADD PARAMETERS LIKE FORM OF DISPLAY, TYPE OF STAT
+*/
+const checkMessageType = (message) => {
+
+    if(message.includes('-n') && message.includes('-c'))
+        return "task"
+
+    if(message.includes('taskList')) 
+        return "taskList"
+        
+    if(message.includes('taskStats')) 
+        return "taskStats"
+
+    return ""
 }
 
 const saveUser = async (msg) => {
@@ -78,21 +108,39 @@ const saveUser = async (msg) => {
 }
 
 const saveTask = async (task, chatId) => {
-    // TODO: SET CREATED STAMP
-    // TODO: REMOVE SPACES FROM FIELDS
+
     let newTask = new Task({
         chatId: chatId,
-        taskName: task.taskName,
-        taskType: task.taskType,
-        taskClassification: task.taskClassification,
-        createdStamp: 0
+        taskName: task.taskName.trim(),
+        taskType: task.taskType.trim(),
+        taskClassification: task.taskClassification.trim(),
+        createdStamp: getDate()
     })
 
-    console.log(newTask)
+    console.log({newTask})
 
-    return response = newTask.save()
-                                .then(res => 'Task saved on Mongo')
-                                .catch(err => { throw new Error(`Error ${err}`) })
+    const save = await newTask.save()
+            .then(res => {
+                return getDayTasks(chatId, newTask.createdStamp)
+            })
+            .catch(err => { throw new Error(`Error ${err}`) })
+    return save
+}
+
+const getDate = () => {
+    let today = new Date()
+    let dd = String(today.getDate()).padStart(2, '0')
+    let mm = String(today.getMonth() + 1).padStart(2, '0')
+    let yyyy = today.getFullYear()
+    return dd + mm + yyyy
+}
+
+
+const getDayTasks = async (chatId, day) => {
+    return Task.countDocuments({ chatId:chatId, createdStamp: day }, (err, res) => {
+        if (err) return err
+        return res
+    })
 }
 
 
