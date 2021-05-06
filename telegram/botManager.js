@@ -27,8 +27,26 @@ const botManager = () => {
                     break
 
                 case "taskList":
-                    bot.sendMessage(chatId, 'Opps! function not implemented yet, sorry')
+                    taskList(chatId, getDate())
+                        .then(res => {
+                            bot.sendMessage(chatId, `You have complete ${res.length} so far!`)
+                            for(task of res) {
+                                bot.sendMessage(chatId, `[${task.createdStamp}][${task.taskType}] ${task.taskName} - ${task.taskClassification} `)
+                            }
+                        })
+                        .catch(err => bot.sendMessage(chatId, `Opps! we have an error with your petition --> ${err}`))
                     break
+
+                case "yesterday":
+                    taskList(chatId, getDate(1))
+                        .then(res => {
+                            bot.sendMessage(chatId, `You completed ${res.length} tasks yesterday!`)
+                            for(task of res) {
+                                bot.sendMessage(chatId, `[${task.createdStamp}][${task.taskType}] ${task.taskName} - ${task.taskClassification} `)
+                            }
+                        })
+                        .catch(err => bot.sendMessage(chatId, `Opps! we have an error with your petition --> ${err}`))
+                    break       
 
                 case "taskStats":
                     bot.sendMessage(chatId, 'Opps! function not implemented yet, sorry')
@@ -97,6 +115,13 @@ const saveTask = async (task, chatId) => {
 
 const getDayTasks = async (chatId, day) => {
     return Task.countDocuments({ chatId:chatId, createdStamp: day }, (err, res) => {
+        if (err) return err
+        return res
+    })
+}
+
+const taskList = (chatId, day) => {
+    return Task.find({chatId: chatId, createdStamp: day}, (err, res) => {
         if (err) return err
         return res
     })

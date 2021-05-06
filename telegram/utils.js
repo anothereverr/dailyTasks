@@ -28,15 +28,18 @@ const checkMessageType = (message) => {
     if(message.includes('taskStats')) 
         return "taskStats"
 
+    if(message.includes('yesterday')) 
+        return "yesterday"
+
     return ""
 }
 
-const getDate = () => {
+const getDate = (daysBack = 0) => {
     let today = new Date()
     let dd = String(today.getDate()).padStart(2, '0')
     let mm = String(today.getMonth() + 1).padStart(2, '0')
     let yyyy = today.getFullYear()
-    return dd + mm + yyyy
+    return (dd-daysBack) + mm + yyyy
 }
 
 module.exports = {
