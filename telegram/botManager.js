@@ -37,7 +37,7 @@ const botManager = () => {
                         .then(res => {
                             bot.sendMessage(chatId, `You have complete ${res.length} so far!`)
                             for(task of res) {
-                                bot.sendMessage(chatId, `[${task.createdStamp}][${task.taskType}] ${task.taskName} - ${task.taskClassification} `)
+                                bot.sendMessage(chatId, `\`\`\` ${task.taskType} - ${task.taskName} - ${task.taskClassification} \`\`\``, opts)
                             }
                         })
                         .catch(err => bot.sendMessage(chatId, `Opps! we have an error with your petition --> ${err}`))
@@ -48,7 +48,7 @@ const botManager = () => {
                         .then(res => {
                             bot.sendMessage(chatId, `You completed ${res.length} tasks yesterday!`)
                             for(task of res) {
-                                bot.sendMessage(chatId, `[${task.createdStamp}][${task.taskType}] ${task.taskName} - ${task.taskClassification} `)
+                                bot.sendMessage(chatId, `\`\`\` ${task.taskType} - ${task.taskName} - ${task.taskClassification} \`\`\``, opts)
                             }
                         })
                         .catch(err => bot.sendMessage(chatId, `Opps! we have an error with your petition --> ${err}`))
