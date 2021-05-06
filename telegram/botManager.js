@@ -1,5 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api')
 const config = require('../config/bot.json')
+const help = require('../config/help.json')
 const User = require('../model/user')
 const Task = require('../model/task')
 const {getCleanMessage, checkMessageType, getDate} = require('./utils')
@@ -52,8 +53,12 @@ const botManager = () => {
                     bot.sendMessage(chatId, 'Opps! function not implemented yet, sorry')
                     break
 
+                case "help":
+                    bot.sendMessage(chatId, `Hello!, this are my current commands are the following:\n${help.help} \nHope it helps!`) 
+                    break
+
                 default:
-                    bot.sendMessage(chatId, 'Opps! i dont know what are you asking for, try to type [help]')  
+                    bot.sendMessage(chatId, `Hello, i dont know what you mean but my current commands are the following: \n ${help.help}`)  
                     break  
             }
         }).catch(err => console.log(err))

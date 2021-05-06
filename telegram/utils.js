@@ -30,6 +30,9 @@ const checkMessageType = (message) => {
 
     if(message.includes('yesterday')) 
         return "yesterday"
+    
+    if(message.includes('help')) 
+        return "help"
 
     return ""
 }
