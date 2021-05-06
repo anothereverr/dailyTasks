@@ -8,6 +8,11 @@ const {getCleanMessage, checkMessageType, getDate} = require('./utils')
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(config.token, {polling: true})
 
+// Bot options
+const opts = {
+    parse_mode: 'Markdown'
+}
+
 const botManager = () => {
     bot.on('message', (msg) => {
         const chatId = msg.chat.id 
@@ -54,11 +59,11 @@ const botManager = () => {
                     break
 
                 case "help":
-                    bot.sendMessage(chatId, `Hello!, this are my current commands are the following:\n${help.help} \nHope it helps!`) 
+                    bot.sendMessage(chatId, `Hello!, this are my current commands are the following:\n${help.help} \nHope it helps!`, opts) 
                     break
 
                 default:
-                    bot.sendMessage(chatId, `Hello, i dont know what you mean but my current commands are the following: \n ${help.help}`)  
+                    bot.sendMessage(chatId, `Hello, i dont know what you mean but my current commands are the following:\n${help.help}`, opts)  
                     break  
             }
         }).catch(err => console.log(err))
