@@ -61,11 +61,11 @@ const botManager = () => {
                     break
 
                 case "help":
-                    bot.sendMessage(chatId, `Hello!, this are my current commands are the following:\n${help.help} \nHope it helps!`, opts) 
+                    bot.sendMessage(chatId, `\`\`\` Hello!, this are my current commands are the following:\n${help.help} \nHope it helps! \`\`\``, opts) 
                     break
 
                 default:
-                    bot.sendMessage(chatId, `Hello, i dont know what you mean but my current commands are the following:\n${help.help}`, opts)  
+                    bot.sendMessage(chatId, `\`\`\` Hello, i dont know what you mean but my current commands are the following: \`\`\`\n${help.help} `, opts)  
                     break  
             }
         }).catch(err => console.log(err))
