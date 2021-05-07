@@ -56,7 +56,7 @@ const botManager = () => {
 
                 case "taskStats":
                     weekStat(chatId)
-                        .then(res => console.log(res))
+                        .then(res => bot.sendMessage(chatId, `\`\`\` ${res}\`\`\``, opts))
                         .catch(err => bot.sendMessage(chatId, `Opps! we have an error with your petition --> ${err}`))
                     break
 
@@ -132,6 +132,13 @@ const getDayTasks = async (chatId, day) => {
     })
 }
 
+const getTasksByClassification = async (chatId, days, classification) => {
+    return Task.countDocuments({ chatId:chatId, createdStamp: { $in: days }, taskClassification:classification }, (err, res) => {
+        if (err) return err
+        return res
+    })
+}
+
 const taskList = (chatId, day) => {
     return Task.find({chatId: chatId, createdStamp: day}, (err, res) => {
         if (err) return err
@@ -142,12 +149,8 @@ const taskList = (chatId, day) => {
 const weekStat = async (chatId) => {
     const classificationList = await getDistinctTasks(chatId)
     const weekDays = getWeekDays() 
-    for (classification of classificationList) {
-        for (day of weekDays) {
-            console.log(`Day ${day} -- task ${classification}`)
-        }
-    }
-    return 'DONE'
+    const stats = await calculateStat(chatId, classificationList, weekDays)
+    return stats
 }
 
 const getDistinctTasks = (chatId) => {
@@ -155,6 +158,35 @@ const getDistinctTasks = (chatId) => {
        if (err) return err
        return res
     })
+}
+
+const calculateStat = async (chatId, classificationList, weekDays) => {
+    let totalTasks = 0
+    let classificationTasks = []
+    
+    // Tasks by classification
+    for (classification of classificationList) {
+        let totalAmount = await getTasksByClassification(chatId, weekDays, classification)
+        classificationTasks.push({
+            classification: classification,
+            amount: totalAmount
+        })
+    }
+
+    // Total tasks
+    for (day of weekDays) {
+        totalTasks+= parseInt(await getDayTasks(chatId, day))
+    }
+
+    return buildStatMessage(totalTasks, classificationTasks)
+}
+
+const buildStatMessage = (totalTasks, classificationTasks) => {
+    let message = `This week so far you have completed ${totalTasks} tasks \nBy classification:`
+    for (taskClass of classificationTasks)  {
+        message += `\n${taskClass.classification}: ${taskClass.amount}`
+    }
+    return message
 }
 
 module.exports = botManager
