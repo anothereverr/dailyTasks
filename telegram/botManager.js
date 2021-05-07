@@ -3,7 +3,7 @@ const config = require('../config/bot.json')
 const help = require('../config/help.json')
 const User = require('../model/user')
 const Task = require('../model/task')
-const {getCleanMessage, checkMessageType, getDate} = require('./utils')
+const {getCleanMessage, checkMessageType, getDate, getWeekDays} = require('./utils')
 
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(config.token, {polling: true})
@@ -55,7 +55,9 @@ const botManager = () => {
                     break       
 
                 case "taskStats":
-                    bot.sendMessage(chatId, 'Opps! function not implemented yet, sorry')
+                    weekStat(chatId)
+                        .then(res => console.log(res))
+                        .catch(err => bot.sendMessage(chatId, `Opps! we have an error with your petition --> ${err}`))
                     break
 
                 case "help":
@@ -134,6 +136,24 @@ const taskList = (chatId, day) => {
     return Task.find({chatId: chatId, createdStamp: day}, (err, res) => {
         if (err) return err
         return res
+    })
+}
+
+const weekStat = async (chatId) => {
+    const classificationList = await getDistinctTasks(chatId)
+    const weekDays = getWeekDays() 
+    for (classification of classificationList) {
+        for (day of weekDays) {
+            console.log(`Day ${day} -- task ${classification}`)
+        }
+    }
+    return 'DONE'
+}
+
+const getDistinctTasks = (chatId) => {
+    return Task.find({ chatId:chatId }).distinct('taskClassification', (err, res) => {
+       if (err) return err
+       return res
     })
 }
 

@@ -45,8 +45,19 @@ const getDate = (daysBack = 0) => {
     return (dd-daysBack) + mm + yyyy
 }
 
+const getWeekDays = () => {
+    const today = new Date()
+    const dayNumber = today.getDay()
+    let weekDays = []
+    for (let i = 0; i < dayNumber ; i++) {
+        weekDays[i] = getDate(i)
+    }
+    return weekDays
+}
+
 module.exports = {
     getCleanMessage,
     checkMessageType,
-    getDate
+    getDate,
+    getWeekDays
 }
