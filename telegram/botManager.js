@@ -139,6 +139,13 @@ const getTasksByClassification = async (chatId, days, classification) => {
     })
 }
 
+const getTasksByType = async (chatId, days, type) => {
+    return Task.countDocuments({ chatId:chatId, createdStamp: { $in: days }, taskType:type }, (err, res) => {
+        if (err) return err
+        return res
+    })
+}
+
 const taskList = (chatId, day) => {
     return Task.find({chatId: chatId, createdStamp: day}, (err, res) => {
         if (err) return err
@@ -148,8 +155,9 @@ const taskList = (chatId, day) => {
 
 const weekStat = async (chatId) => {
     const classificationList = await getDistinctTasks(chatId)
+    const typeList = await getDistinctTasksTypes(chatId)
     const weekDays = getWeekDays() 
-    const stats = await calculateStat(chatId, classificationList, weekDays)
+    const stats = await calculateStat(chatId, classificationList, typeList, weekDays)
     return stats
 }
 
@@ -160,9 +168,17 @@ const getDistinctTasks = (chatId) => {
     })
 }
 
-const calculateStat = async (chatId, classificationList, weekDays) => {
+const getDistinctTasksTypes = (chatId) => {
+    return Task.find({ chatId:chatId }).distinct('taskType', (err, res) => {
+       if (err) return err
+       return res
+    })
+}
+
+const calculateStat = async (chatId, classificationList, typeList, weekDays) => {
     let totalTasks = 0
     let classificationTasks = []
+    let typeTasks = []
     
     // Tasks by classification
     for (classification of classificationList) {
@@ -173,18 +189,31 @@ const calculateStat = async (chatId, classificationList, weekDays) => {
         })
     }
 
+    // Tasks by classification
+    for (type of typeList) {
+        let totalAmount = await getTasksByType(chatId, weekDays, type)
+        typeTasks.push({
+            type: type,
+            amount: totalAmount
+        })
+    }
+
     // Total tasks
     for (day of weekDays) {
         totalTasks+= parseInt(await getDayTasks(chatId, day))
     }
 
-    return buildStatMessage(totalTasks, classificationTasks)
+    return buildStatMessage(totalTasks, classificationTasks, typeTasks)
 }
 
-const buildStatMessage = (totalTasks, classificationTasks) => {
-    let message = `This week so far you have completed ${totalTasks} tasks \nBy classification:`
+const buildStatMessage = (totalTasks, classificationTasks, typeTasks) => {
+    let message = `This week so far you have completed ${totalTasks} tasks \n\nBy classification:`
     for (taskClass of classificationTasks)  {
         message += `\n${taskClass.classification}: ${taskClass.amount}`
+    }
+    message+= '\n\nBy Type:'
+    for (taskType of typeTasks)  {
+        message += `\n${taskType.type}: ${taskType.amount}`
     }
     return message
 }
